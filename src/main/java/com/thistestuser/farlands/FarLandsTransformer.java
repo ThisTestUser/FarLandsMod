@@ -91,8 +91,11 @@ public class FarLandsTransformer implements IClassTransformer
         		&& ((LdcInsnNode)ain).cst instanceof Double && (Double)((LdcInsnNode)ain).cst == 3.2E7D)
         			((LdcInsnNode)ain).cst = Double.MAX_VALUE;
         		else if(ain.getOpcode() == Opcodes.LDC 
-        		&& ((LdcInsnNode)ain).cst instanceof Double && (Double)((LdcInsnNode)ain).cst == 3.0E7D)
-        			((LdcInsnNode)ain).cst = Double.MAX_VALUE;
+        				&& ((LdcInsnNode)ain).cst instanceof Double && (Double)((LdcInsnNode)ain).cst == 3.0E7D)
+        			((LdcInsnNode)ain).cst = 4294967294D;
+        		else if(ain.getOpcode() == Opcodes.LDC 
+        				&& ((LdcInsnNode)ain).cst instanceof Double && (Double)((LdcInsnNode)ain).cst == -3.0E7D)
+        			((LdcInsnNode)ain).cst = -4294967294D;
         
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         classNode.accept(classWriter);
