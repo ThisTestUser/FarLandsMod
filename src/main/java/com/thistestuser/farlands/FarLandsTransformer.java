@@ -37,6 +37,8 @@ public class FarLandsTransformer implements IClassTransformer
         	return patchClassASMBorder(name, classBytes, isObfuscated);
         else if(transformedName.equals("net.minecraft.entity.player.EntityPlayer"))
         	return patchClassASMPlayer(name, classBytes, isObfuscated);
+        else if(transformedName.equals("net.minecraft.server.management.PlayerList"))
+        	return patchClassASMPlayerList(name, classBytes, isObfuscated);
 		return classBytes;
     }
     
@@ -138,6 +140,26 @@ public class FarLandsTransformer implements IClassTransformer
         			((LdcInsnNode)ain).cst = -2147483648D;
         		else if(ain.getOpcode() == Opcodes.LDC 
         		&& ((LdcInsnNode)ain).cst instanceof Integer && (Integer)((LdcInsnNode)ain).cst == 29999999)
+        			((LdcInsnNode)ain).cst = Integer.MAX_VALUE;
+        
+        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+        classNode.accept(classWriter);
+        return classWriter.toByteArray();
+    }
+    
+    public byte[] patchClassASMPlayerList(String name, byte[] classBytes, boolean obfuscated)
+    {
+    	ClassNode classNode = new ClassNode();
+        ClassReader classReader = new ClassReader(classBytes);
+        classReader.accept(classNode, 0);
+        
+        for(MethodNode method : classNode.methods)
+        	for(AbstractInsnNode ain : method.instructions.toArray())
+        		if(ain.getOpcode() == Opcodes.LDC 
+        		&& ((LdcInsnNode)ain).cst instanceof Integer && (Integer)((LdcInsnNode)ain).cst == -29999872)
+        			((LdcInsnNode)ain).cst = Integer.MIN_VALUE;
+        		else if(ain.getOpcode() == Opcodes.LDC 
+        		&& ((LdcInsnNode)ain).cst instanceof Integer && (Integer)((LdcInsnNode)ain).cst == 29999872)
         			((LdcInsnNode)ain).cst = Integer.MAX_VALUE;
         
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
