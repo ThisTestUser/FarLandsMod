@@ -1,6 +1,6 @@
 ## Far Lands Mod
 A mod to restore the far lands in Forge.
-This mod was made for 1.12.2, but this should theoretically work from 1.8 to 1.12.2.
+This mod was made for 1.12.2, but it should theoretically work from 1.8 to 1.12.2. It will not work in versions 1.13 and above.
 
 ## Links
 To download the mod, head to the releases page.
