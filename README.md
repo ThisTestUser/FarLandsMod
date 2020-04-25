@@ -1,6 +1,13 @@
 ## Far Lands Mod
 A mod to restore the far lands in Forge.
-This mod was made for 1.12.2, but this should work for any version.
+This mod was made for 1.12.2, but this should theoretically work from 1.8 to 1.12.2.
+
+## Links
+To download the mod, head to the releases page.
+
+To view an exploration of the far lands, check out the link below. (Note: You will need to edit some of the dimension mods to make it compatible with the far lands)
+
+https://github.com/ThisTestUser/FarLandsChronicles
 
 ### How does this work?
 This mod works by using ASM to directly patch NoiseGeneratorOctaves.class.
