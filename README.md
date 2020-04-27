@@ -5,6 +5,10 @@ This mod was made for 1.12.2, but it should theoretically work from 1.8 to 1.12.
 ## Links
 To download the mod, head to the releases page.
 
+To download a version of the mod that only extends the world border, use this version:
+
+https://github.com/ThisTestUser/FarLandsMod/files/3170472/farlands-1.13NoFarLands.zip
+
 To view an exploration of the far lands, check out the link below. (Note: You will need to edit some of the dimension mods to make it compatible with the far lands)
 
 https://github.com/ThisTestUser/FarLandsChronicles
