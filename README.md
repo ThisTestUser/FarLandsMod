@@ -1,13 +1,13 @@
 ## Far Lands Mod
-A mod to restore the far lands in Forge.
+A mod to restore the far lands in Forge. [![downloads](https://img.shields.io/github/downloads/ThisTestUser/FarLandsMod/total.svg)](https://github.com/ThisTestUser/FarLandsMod/releases/latest) 
 This mod was made for 1.12.2, but it should theoretically work from 1.8 to 1.12.2. It will not work in versions 1.13 and above.
 
 ## Links
 To download the mod, head to the releases page.
 
-To download a version of the mod that only extends the world border, use this version (1.8-1.12.2):
+The first time you load the mod, you will see a config file generate at %mc_dir%/configs/farlandsmod.cfg.
 
-https://github.com/ThisTestUser/FarLandsMod/files/4606143/farlands-1.3NoFarLands.zip
+You can use the config file to edit certain features of this mod.
 
 To view an exploration of the far lands, check out the link below. (Note: You will need to edit some of the dimension mods to make it compatible with the far lands)
 

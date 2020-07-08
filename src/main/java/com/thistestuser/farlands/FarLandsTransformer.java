@@ -4,41 +4,54 @@ import org.apache.logging.log4j.LogManager;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
+
+import com.thistestuser.farlandscfg.Config;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
 public class FarLandsTransformer implements IClassTransformer
 {
+	private final Config config = Config.instance;
+	
     @Override
     public byte[] transform(String name, String transformedName, byte[] classBytes) 
     {
     	boolean isObfuscated = !name.equals(transformedName);
-        if(transformedName.equals("net.minecraft.world.gen.NoiseGeneratorOctaves"))
+        if(transformedName.equals("net.minecraft.world.gen.NoiseGeneratorOctaves") && config.isFarLands)
         	return patchClassASMOcto(name, classBytes, isObfuscated);
-        else if(transformedName.equals("net.minecraft.command.CommandBase")
+        else if((transformedName.equals("net.minecraft.command.CommandBase")
         		|| transformedName.equals("net.minecraft.command.CommandSetSpawnpoint")
         		|| transformedName.equals("net.minecraft.command.server.CommandSetDefaultSpawnpoint")
         		|| transformedName.equals("net.minecraft.world.ChunkCache")
         		|| transformedName.equals("net.minecraft.world.World")
         		|| transformedName.equals("net.minecraft.util.math.BlockPos")
-        		|| transformedName.equals("net.minecraft.util.BlockPos"))
+        		|| transformedName.equals("net.minecraft.util.BlockPos")) && config.extendWB)
         	return patchClassASMCmdbase(name, classBytes, isObfuscated);
-        else if(transformedName.equals("net.minecraft.network.NetHandlerPlayServer")
-        		|| transformedName.equals("net.minecraft.entity.Entity"))
+        else if((transformedName.equals("net.minecraft.network.NetHandlerPlayServer")
+        		|| transformedName.equals("net.minecraft.entity.Entity")) && config.extendWB)
         	return patchClassNetHandler(name, classBytes, isObfuscated);
-        else if(transformedName.equals("net.minecraft.server.MinecraftServer")
+        else if((transformedName.equals("net.minecraft.server.MinecraftServer")
         		|| transformedName.equals("net.minecraft.world.border.WorldBorder")
         		|| transformedName.equals("net.minecraft.world.storage.WorldInfo")
-        		|| transformedName.equals("net.minecraft.command.CommandWorldBorder"))
+        		|| transformedName.equals("net.minecraft.command.CommandWorldBorder")) && config.extendWB)
         	return patchClassASMBorder(name, classBytes, isObfuscated);
-        else if(transformedName.equals("net.minecraft.entity.player.EntityPlayer"))
+        else if(transformedName.equals("net.minecraft.entity.player.EntityPlayer") && config.extendWB)
         	return patchClassASMPlayer(name, classBytes, isObfuscated);
-        else if(transformedName.equals("net.minecraft.server.management.PlayerList"))
+        else if(transformedName.equals("net.minecraft.server.management.PlayerList") && config.extendWB)
         	return patchClassASMPlayerList(name, classBytes, isObfuscated);
+        else if(transformedName.equals("net.minecraft.world.gen.ChunkGeneratorOverworld") && config.offset)
+        	return patchChunkGen(name, classBytes, isObfuscated);
 		return classBytes;
     }
     
@@ -48,7 +61,7 @@ public class FarLandsTransformer implements IClassTransformer
         ClassReader classReader = new ClassReader(classBytes);
         classReader.accept(classNode, 0);
         
-        LogManager.getLogger().info("[FAR LANDS] PATCHING NOISE GENERATOR!");
+        LogManager.getLogger().info("[FarLands] Patching noise generator!");
         for(MethodNode method : classNode.methods)
         	if(method.desc.equals("([DIIIIIIDDD)[D"))
         		for(AbstractInsnNode ain : method.instructions.toArray())
@@ -165,5 +178,67 @@ public class FarLandsTransformer implements IClassTransformer
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         classNode.accept(classWriter);
         return classWriter.toByteArray();
+    }
+    
+    public byte[] patchChunkGen(String name, byte[] classBytes, boolean obfuscated) 
+    {
+    	ClassNode classNode = new ClassNode();
+        ClassReader classReader = new ClassReader(classBytes);
+        classReader.accept(classNode, 0);
+        //We cannot depend on any names, as we are trying to make this compatible
+        boolean found = false;
+        for(MethodNode method : classNode.methods)
+        {
+        	Type returnType = Type.getReturnType(method.desc);
+        	for(AbstractInsnNode ain : method.instructions.toArray())
+        		if(ain.getOpcode() == Opcodes.LDC && ((LdcInsnNode)ain).cst instanceof Long
+        			&& (long)((LdcInsnNode)ain).cst == 132897987541L)
+        		{
+        			found = true;
+        			InsnList list = new InsnList();
+        			list.add(new VarInsnNode(Opcodes.ILOAD, 1));
+        			list.add(getNumberInsn(config.offsetX));
+        			list.add(new InsnNode(Opcodes.IADD));
+        			list.add(new VarInsnNode(Opcodes.ISTORE, 1));
+        			list.add(new VarInsnNode(Opcodes.ILOAD, 2));
+        			list.add(getNumberInsn(config.offsetZ));
+        			list.add(new InsnNode(Opcodes.IADD));
+        			list.add(new VarInsnNode(Opcodes.ISTORE, 2));
+        			method.instructions.insert(ain, list);
+        		}else if(found && ain.getOpcode() == Opcodes.NEW
+        			&& Type.getObjectType(((TypeInsnNode)ain).desc).equals(returnType))
+        		{
+        			LogManager.getLogger().info("[FarLands] Successfully applied offsets!");
+        			found = true;
+        			InsnList list = new InsnList();
+        			list.add(new VarInsnNode(Opcodes.ILOAD, 1));
+        			list.add(getNumberInsn(config.offsetX));
+        			list.add(new InsnNode(Opcodes.ISUB));
+        			list.add(new VarInsnNode(Opcodes.ISTORE, 1));
+        			list.add(new VarInsnNode(Opcodes.ILOAD, 2));
+        			list.add(getNumberInsn(config.offsetZ));
+        			list.add(new InsnNode(Opcodes.ISUB));
+        			list.add(new VarInsnNode(Opcodes.ISTORE, 2));
+        			method.instructions.insertBefore(ain, list);
+        			break;
+        		}
+        	if(found)
+        		break;
+        }
+        
+        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+        classNode.accept(classWriter);
+        return classWriter.toByteArray();
+    }
+    
+    private AbstractInsnNode getNumberInsn(int number)
+    {
+    	if(number >= -1 && number <= 5)
+    		return new InsnNode(number + 3);
+    	if(number >= -128 && number <= 127)
+    		return new IntInsnNode(Opcodes.BIPUSH, number);
+    	if (number >= -32768 && number <= 32767)
+    		return new IntInsnNode(Opcodes.SIPUSH, number);
+    	return new LdcInsnNode(number);
     }
 }
