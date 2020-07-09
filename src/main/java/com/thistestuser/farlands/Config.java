@@ -1,4 +1,4 @@
-package com.thistestuser.farlandscfg;
+package com.thistestuser.farlands;
 
 import java.io.BufferedReader;
 import java.io.File;

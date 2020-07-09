@@ -16,8 +16,6 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import com.thistestuser.farlandscfg.Config;
-
 import net.minecraft.launchwrapper.IClassTransformer;
 
 public class FarLandsTransformer implements IClassTransformer
@@ -50,7 +48,8 @@ public class FarLandsTransformer implements IClassTransformer
         	return patchClassASMPlayer(name, classBytes, isObfuscated);
         else if(transformedName.equals("net.minecraft.server.management.PlayerList") && config.extendWB)
         	return patchClassASMPlayerList(name, classBytes, isObfuscated);
-        else if(transformedName.equals("net.minecraft.world.gen.ChunkGeneratorOverworld") && config.offset)
+        else if((transformedName.equals("net.minecraft.world.gen.ChunkGeneratorOverworld")
+        		|| transformedName.equals("net.minecraft.world.gen.ChunkProviderGenerate")) && config.offset)
         	return patchChunkGen(name, classBytes, isObfuscated);
 		return classBytes;
     }
