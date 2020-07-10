@@ -93,7 +93,7 @@ public class Config
 			writer.println("#Should we extend the world border?");
 			writer.println("extendwb:" + extendWB);
 			writer.println("#Should we offset the terrain (offsetX and offsetZ will not do anything when this is false)?");
-			writer.println("#Warning: Terrain features (trees, ice spikes, etc) will not be offset!");
+			writer.println("#There will be small differences in some terrain features like ores");
 			writer.println("offset:" + offset);
 			writer.println("#Note: The offset is written in chunk coordinates, so please divide the value you want by 16!");
 			writer.println("#Example: If offsetX and offsetZ are both set to 100, the center of the map will generate terrain at 1600,1600.");

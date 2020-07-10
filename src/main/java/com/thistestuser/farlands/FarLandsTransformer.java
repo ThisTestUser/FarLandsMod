@@ -1,5 +1,8 @@
 package com.thistestuser.farlands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -48,10 +51,10 @@ public class FarLandsTransformer implements IClassTransformer
         else if(transformedName.equals("net.minecraft.server.management.PlayerList") && config.extendWB)
         	return patchClassASMPlayerList(name, classBytes, isObfuscated);
         else if((transformedName.equals("net.minecraft.world.gen.ChunkGeneratorOverworld")
+        		|| transformedName.equals("net.minecraft.world.gen.ChunkProviderGenerate")
         		|| transformedName.equals("net.minecraft.world.gen.ChunkGeneratorEnd")
-        		|| transformedName.equals("net.minecraft.world.gen.ChunkGeneratorHell")
-        		|| transformedName.equals("net.minecraft.world.gen.ChunkProviderGenerate")) && config.offset)
-        	return patchChunkGen(name, classBytes, isObfuscated);
+        		|| transformedName.equals("net.minecraft.world.gen.ChunkGeneratorHell")) && config.offset)
+        	return patchChunkGen(transformedName, name, classBytes, isObfuscated);
 		return classBytes;
     }
     
@@ -185,7 +188,7 @@ public class FarLandsTransformer implements IClassTransformer
         return classWriter.toByteArray();
     }
     
-    public byte[] patchChunkGen(String name, byte[] classBytes, boolean obfuscated) 
+    public byte[] patchChunkGen(String transformedName, String name, byte[] classBytes, boolean obfuscated) 
     {
     	ClassNode classNode = new ClassNode();
         ClassReader classReader = new ClassReader(classBytes);
@@ -213,7 +216,7 @@ public class FarLandsTransformer implements IClassTransformer
         		}else if(found && ain.getOpcode() == Opcodes.NEW
         			&& Type.getObjectType(((TypeInsnNode)ain).desc).equals(returnType))
         		{
-        			LogManager.getLogger().info("[FarLands] Successfully applied offsets!");
+        			LogManager.getLogger().info("[FarLands] Successfully applied offset for " + transformedName);
         			found = true;
         			InsnList list = new InsnList();
         			list.add(new VarInsnNode(Opcodes.ILOAD, 1));
@@ -229,6 +232,35 @@ public class FarLandsTransformer implements IClassTransformer
         		}
         	if(found)
         		break;
+        }
+        
+        if(transformedName.equals("net.minecraft.world.gen.ChunkGeneratorOverworld")
+        	|| transformedName.equals("net.minecraft.world.gen.ChunkProviderGenerate"))
+        {
+        	boolean found2 = false;
+        	for(MethodNode method : classNode.methods)
+        	{
+        		List<AbstractInsnNode> i2l = new ArrayList<>();
+        		for(AbstractInsnNode ain : method.instructions.toArray())
+        			if(ain.getOpcode() == Opcodes.I2L)
+        				i2l.add(ain);
+        			else if(ain.getOpcode() == Opcodes.LXOR)
+        			{
+        				LogManager.getLogger().info("[FarLands] Successfully applied offset part 2!");
+        				found2 = true;
+        				for(int i = 0; i < i2l.size(); i++)
+        				{
+        					AbstractInsnNode a = i2l.get(i);
+        					InsnList list = new InsnList();
+        					list.add(getNumberInsn(i == 0 ? config.offsetX : config.offsetZ));
+                			list.add(new InsnNode(Opcodes.IADD));
+        					method.instructions.insertBefore(a, list);
+        				}
+        				break;
+        			}
+        		if(found2)
+        			break;
+        	}
         }
         
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
