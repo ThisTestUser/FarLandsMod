@@ -16,7 +16,7 @@ https://github.com/ThisTestUser/FarLandsChronicles
 
 ### How does this work?
 This mod works by using ASM to directly patch NoiseGeneratorOctaves.class.
-In beta 1.8 and above, the following code below is used to fix the far lands:
+From beta 1.8 to 1.13.2, the following code below is used to fix the far lands:
 ```
 k = k % 16777216L;
 l = l % 16777216L;
@@ -30,4 +30,4 @@ For example, here is the far lands in Twilight Forest.
 ![twilightforest](https://user-images.githubusercontent.com/15678918/46991807-6d96a200-d0d5-11e8-9c81-5a811e48b7a5.png)
 And here it is in planet Neptune (Galaticcraft extra planets mod)
 ![neptune](https://user-images.githubusercontent.com/15678918/47047805-ad599a00-d166-11e8-9198-05b096f6f4a9.png)
-Note that not all dimensions added support this far lands feature, as some use a completely different terrain generator.
+Note that dimensions that do not use the vanilla terrain generator will not have the far lands enabled.
