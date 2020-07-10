@@ -48,6 +48,8 @@ public class FarLandsTransformer implements IClassTransformer
         else if(transformedName.equals("net.minecraft.server.management.PlayerList") && config.extendWB)
         	return patchClassASMPlayerList(name, classBytes, isObfuscated);
         else if((transformedName.equals("net.minecraft.world.gen.ChunkGeneratorOverworld")
+        		|| transformedName.equals("net.minecraft.world.gen.ChunkGeneratorEnd")
+        		|| transformedName.equals("net.minecraft.world.gen.ChunkGeneratorHell")
         		|| transformedName.equals("net.minecraft.world.gen.ChunkProviderGenerate")) && config.offset)
         	return patchChunkGen(name, classBytes, isObfuscated);
 		return classBytes;
