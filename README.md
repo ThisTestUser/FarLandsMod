@@ -1,5 +1,7 @@
 ## Far Lands Mod [![downloads](https://img.shields.io/github/downloads/ThisTestUser/FarLandsMod/total.svg)](https://github.com/ThisTestUser/FarLandsMod/releases/latest)
-A mod to restore the far lands in Forge. This mod was made for 1.12.2, but it should theoretically work from 1.8 to 1.12.2. It will not work in versions 1.13 and above.
+A mod to restore the far lands in Forge. This mod was made for 1.12.2, but should theoretically work from 1.8 to 1.12.2.
+
+Here is the far lands mod for 1.13 and above: https://github.com/ThisTestUser/FarLandsModV2
 
 ## Links
 To download the mod, head to the releases page.
