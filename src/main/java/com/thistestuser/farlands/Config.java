@@ -92,12 +92,13 @@ public class Config
 			writer.println("farlands:" + isFarLands);
 			writer.println("#Should we extend the world border?");
 			writer.println("extendwb:" + extendWB);
-			writer.println("#Should we offset the terrain (offsetX and offsetZ will not do anything when this is false)?");
+			writer.println("#Should we offset the terrain?");
+			writer.println("#offestX and offsetZ will not do anything if this is false");
 			writer.println("#There will be small differences in some terrain features like ores");
 			writer.println("offset:" + offset);
-			writer.println("#Note: The offset is written in chunk coordinates, so please divide the value you want by 16!");
+			writer.println("#Note: The offsets are written in chunk coordinates, so please divide the value you want by 16!");
 			writer.println("#Example: If offsetX and offsetZ are both set to 100, the center of the map will generate terrain at 1600,1600.");
-			writer.println("#Do not put a value outside of the integer limit (-2147483648 to 2147483647)!");
+			writer.println("#Do not put values outside of the integer limit (-2147483648 to 2147483647)!");
 			writer.println("offsetX:" + offsetX);
 			writer.println("offsetZ:" + offsetZ);
 			writer.close();
