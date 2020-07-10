@@ -59,13 +59,18 @@ public class FarLandsTransformer implements IClassTransformer
         ClassReader classReader = new ClassReader(classBytes);
         classReader.accept(classNode, 0);
         
-        LogManager.getLogger().info("[FarLands] Patching noise generator!");
+        boolean pass = false;
         for(MethodNode method : classNode.methods)
         	if(method.desc.equals("([DIIIIIIDDD)[D"))
         		for(AbstractInsnNode ain : method.instructions.toArray())
         			if(ain.getOpcode() == Opcodes.LDC 
         			&& ((LdcInsnNode)ain).cst instanceof Long && (Long)((LdcInsnNode)ain).cst == 16777216L)
+        			{
         				((LdcInsnNode)ain).cst = Long.MAX_VALUE;
+        				pass = true;
+        			}
+        if(pass)
+        	LogManager.getLogger().info("[FarLands] Noise generator patched successfully!");
         
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         classNode.accept(classWriter);
@@ -105,10 +110,10 @@ public class FarLandsTransformer implements IClassTransformer
         			((LdcInsnNode)ain).cst = Double.MAX_VALUE;
         		else if(ain.getOpcode() == Opcodes.LDC 
         				&& ((LdcInsnNode)ain).cst instanceof Double && (Double)((LdcInsnNode)ain).cst == 3.0E7D)
-        			((LdcInsnNode)ain).cst = 4294967294D;
+        			((LdcInsnNode)ain).cst = 2147483647D;
         		else if(ain.getOpcode() == Opcodes.LDC 
         				&& ((LdcInsnNode)ain).cst instanceof Double && (Double)((LdcInsnNode)ain).cst == -3.0E7D)
-        			((LdcInsnNode)ain).cst = -4294967294D;
+        			((LdcInsnNode)ain).cst = -2147483648D;
         
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         classNode.accept(classWriter);
