@@ -246,7 +246,7 @@ public class FarLandsTransformer implements IClassTransformer
         				i2l.add(ain);
         			else if(ain.getOpcode() == Opcodes.LXOR)
         			{
-        				LogManager.getLogger().info("[FarLands] Successfully applied offset part 2!");
+        				LogManager.getLogger().info("[FarLands] Successfully applied offset for populate()!");
         				found2 = true;
         				for(int i = 0; i < i2l.size(); i++)
         				{
