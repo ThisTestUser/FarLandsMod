@@ -67,13 +67,21 @@ public class FarLandsTransformer implements IClassTransformer
         boolean pass = false;
         for(MethodNode method : classNode.methods)
         	if(method.desc.equals("([DIIIIIIDDD)[D"))
-        		for(AbstractInsnNode ain : method.instructions.toArray())
-        			if(ain.getOpcode() == Opcodes.LDC 
-        			&& ((LdcInsnNode)ain).cst instanceof Long && (Long)((LdcInsnNode)ain).cst == 16777216L)
+			{
+				AbstractInsnNode[] insns = method.instructions.toArray();
+        		for(int i = 0; i < insns.length; i++)
+				{
+					AbstractInsnNode ain = insns[i];
+        			if(ain.getOpcode() == Opcodes.LDC
+						&& ((LdcInsnNode)ain).cst instanceof Long && (Long)((LdcInsnNode)ain).cst == 16777216L
+						&& ain.getNext() != null && ain.getNext().getOpcode() == Opcodes.LREM)
         			{
-        				((LdcInsnNode)ain).cst = Long.MAX_VALUE;
-        				pass = true;
+						method.instructions.remove(ain.getNext());
+						method.instructions.remove(ain);
+						pass = true;
         			}
+				}
+			}
         if(pass)
         	LogManager.getLogger().info("[FarLands] Noise generator patched successfully!");
         
